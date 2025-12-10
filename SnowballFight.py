@@ -1,14 +1,25 @@
 ''' 
     Name: Snowball-Mania
-    Author: 
-    Date: 
+    Author: Kyle Yeh
+    Date: December 5, 2025
     Class: AP Computer Science Principles
-    Python: 
+    Python: 3.13
 '''
 
 import random
 import time
+from colorama import *
+from tkinter import *
 
+screen = Tk()
+frame1 = Frame(screen, width=600, height=600)
+frame1.pack()
+welcomeText = Label(frame1, text='Follow the instructions on the terminal. Thank you for shopping with us.')
+welcomeText.pack()
+
+kills = {}
+
+init()
 
 def printIntro():
     '''
@@ -37,7 +48,15 @@ def getNames():
     ' Return: the list of player names
     ' 
     '''
-
+    playerList = []
+    myName = input("What is your name? ")
+    playerList.append(myName)
+    myName = input("Add other players (one at a time) by typing their names and hitting ENTER. To stop entering names, type 'DONE'. ")
+    while myName != "DONE":
+        playerList.append(myName)
+        myName = input("Add other players (one at a time) by typing their names and hitting ENTER. To stop entering names, type 'DONE'. ")
+    print("Great - time to play!")
+    return playerList
 
 def getThrower(players):
     '''
@@ -47,6 +66,8 @@ def getThrower(players):
     '
     ' Return: player name
     '''
+    thrower = random.choice(players)
+    return thrower
 
     
 def getVictim(players, t):
@@ -59,6 +80,10 @@ def getVictim(players, t):
     '
     ' Return: victim's name
     '''
+    victim = random.choice(players)
+    while (t == victim):
+        victim = random.choice(players)
+    return victim
 
 
 def getHitResult():
@@ -66,11 +91,16 @@ def getHitResult():
     ' Param: none
     ' 
     ' Generate a random number between 1 and 10
-    ' If the number is greater than ___, return True
+    ' If the number is greater than 4 (60% chance), return True
     ' Else, return False
     '
     ' Return: Boolean representing whether or not the snowball hit
     '''
+    hitNum = random.randint(1, 10)
+    if (hitNum > 4):
+        return True
+    else:
+        return False
     
 
 def playSnowballFight(players):
@@ -89,7 +119,31 @@ def playSnowballFight(players):
     ' 
     ' Return: none
     '''
+    init()
 
+    while (len(players) > 1):
+        thrower = getThrower(players)
+        victim = getVictim(players, thrower)
+        hitResult = getHitResult()
+
+        survives1 = Fore.YELLOW + thrower + " throws at " + victim + " and hits, but " + victim + " survives!"
+        survives2 = Fore.YELLOW + thrower + " throws at " + victim + " and hits, but the snowball bounces off and " + victim + " is still standing like a statue!"
+        survives3 = Fore.YELLOW + thrower + " throws at " + victim + " and makes contact... with " + victim + "'s hand! Steeeeeee-rike!"
+
+        ko1 = Fore.RED + thrower + " throws and absolutely destroys " + victim + " - " + victim + " is out of the game!!!"
+        ko2 = Fore.RED + thrower + " throws and murders " + victim + " with an ice ball - " + victim + " is now dead, and " + thrower + " is now wanted."
+
+        if (hitResult == True):
+            koResult = random.randint(1, 2)     # 1 = not KO, 2 = KO
+            if (koResult == 1):
+                print(random.choice([survives1, survives2, survives3]))
+                kills[thrower] = (kills[thrower] + 1 if thrower in kills else 1)
+            else:
+                print(random.choice([ko1, ko2]))
+                players.remove(victim)
+        else:
+            print(Fore.GREEN + thrower + " throws at " + victim + " but has really bad aim and misses.")
+        time.sleep(0.5)
     
 def printOutro(winner):
     '''
@@ -115,3 +169,30 @@ def runProgram():
     '
     ' Return: none
     '''
+    printIntro()
+    testPlayers = getNames()
+    for widget in frame1.winfo_children():
+        widget.destroy()
+    inProgressMessage = Label(frame1, text="Snowball fight in progress. No kills yet!")
+    inProgressMessage.pack()
+    playSnowballFight(testPlayers)
+    printOutro(testPlayers[0])
+
+
+runProgram()
+
+
+testPlayers = ["Jack", "Sam", "Eliana", "Aanya", "Izaiah", "Audrey", "Elam", "John", "Jared", "Aron", "Sebastien", "Tyler", "Collin", "Taylor", "Will", "Nolan", "Llyden", "Xavier", "Landon", "Mr. Holthouse", "Mr. Yeh", "Everett"]
+playSnowballFight(testPlayers)
+printOutro(testPlayers[0])
+# testThrower = getThrower(testPlayers)
+# testVictim = getVictim(testPlayers, testThrower)
+# testHit = getHitResult()
+
+# # successful hit
+# if (testHit == True):
+#     print(testThrower + " throws at " + testVictim + " - HIT")
+# # miss
+# else:
+#     print(testThrower + " throws at " + testVictim + " - MISS")
+
